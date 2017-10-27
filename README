@@ -1,4 +1,4 @@
-parsePapers.py parses a channel called Papers from the Slack channel the Slack token belongs to
+parsePapers.py parses a channel called Papers from the Slack group the Slack token belongs to
 
 Uses slack-history-export, install with:
 
