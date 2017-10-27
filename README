@@ -1,0 +1,9 @@
+parsePapers.py parses a channel called Papers from the Slack channel the Slack token belongs to
+
+Uses on slack-history-export
+
+    npm install slack-history-export
+
+
+To run
+    python parsePapers.py <slack token>
