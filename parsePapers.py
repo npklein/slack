@@ -15,7 +15,7 @@ parser.add_argument("--sender_password", help="gmail password for sender", requi
 args = parser.parse_args()
 
 def html_table(content_list):
-    table  = '<html>\n'
+    table  = '<html>\nWeekly Slack Papers channel links\n\n'
     table += '  <head></head>\n'
     table += '  <body>\n'
     table += '    <table>\n'
@@ -28,25 +28,23 @@ def html_table(content_list):
     table += '</html>'
     return(table)
 
-def send_email(user, pwd, recipient, subject, plain_text, html):
+def send_email(user, pwd, recipient, subject, html):
     TO = recipient if type(recipient) is list else [recipient]
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = user
-    msg['To'] = recipient
-    part1 = MIMEText(plain_text, 'plain')
+    msg['To'] = ', '.join(TO)
+    
     part2 = MIMEText(html, 'html')
-
-    msg.attach(part1)
     msg.attach(part2)
 
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.ehlo()
     server.starttls()
     server.login(user, pwd)
-    server.sendmail(user, TO,msg.as_string())
+    server.sendmail(user, TO, msg.as_string())
     server.close()
-    print('email sent')
+    print('email sent to: \n'+msg['To'] )
 
 
 papers = json.loads(subprocess.check_output(['slack-history-export','--token',args.token,'--channel','papers']).decode('utf-8'))
@@ -61,11 +59,10 @@ for message in papers:
         if week_ago.isoformat() < message['isoDate']:
             attachments = message['attachments']
             for attachment in attachments:
-                print(attachment['title'], attachment['title_link'])
+                #print(attachment['title'], attachment['title_link'])
                 if args.receiver_emails:
                     content_list.append([attachment['title'],attachment['title_link']])
 
-plain_text_msg = 'Weekly Slack Papers channel links\n\n'
 if args.receiver_emails:
     html_msg = html_table(content_list)
-    send_email(args.sender_user, args.sender_password, args.receiver_emails.split(','), subject, plain_text_msg, html_msg)
+    send_email(args.sender_user, args.sender_password,args.receiver_emails.split(','), subject, html_msg)
