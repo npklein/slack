@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import sys
 import os
-
+import re
 
 parser = argparse.ArgumentParser('Get digest of papers channel from last week and, optionally, email it (using gmail for now)\n')
 parser.add_argument("token", help="slack token")
@@ -18,12 +18,13 @@ parser.add_argument("--testrun", help="Do a testrun, do not actually send email"
 args = parser.parse_args()
 
 
-def html_table(content_list):
+def html_table(content_list, from_date, to_date):
     table  = '<html>'
     table += '  <head></head>\n'
     table += '  <body>'
     table += '    Dear all, <br><br>'
-    table += '    We share interesting papers on our Slack channel, and I have been asked to forward these to the JC mailing list once in a while. Hereby this weeks papers: <br><br><br>\n'
+    table += '    We share interesting papers on our Slack channel, and I have been asked to forward these to the JC mailing list once in a while. <br>'
+    table += '    Hereby the papers from '+from_date+' until '+ to_date+': <br><br><br>\n'
     table += '    <table>\n'
     for sublist in content_list:
         table += '      <tr><td>'
@@ -32,7 +33,7 @@ def html_table(content_list):
     table += '    </table>\n'
     table += '    <br>'
     table += '    <br>'
-    table += '    If you don\'t think this should be sent weekly, let me know.<br><br>'
+    table += '    If you don\'t think this should be sent occasionally, let me know at niekdeklein@gmail.com.<br><br>'
     table += '    Kind regards,<br>'
     table += '    Niek'
     table += '  </body>\n'
@@ -45,7 +46,7 @@ def send_email(user, pwd, recipient, subject, html):
     msg['Subject'] = subject
     msg['From'] = user
     msg['To'] = ', '.join(TO)
-    html = html.encode('utf-8')
+    #html = html.encode('utf-8')
     part2 = MIMEText(html, 'html')
     msg.attach(part2)
 
@@ -85,26 +86,31 @@ if __name__ == "__main__":
             out.write('Trying to send at: '+str(datetime.datetime.now()))
 
     papers = json.loads(subprocess.check_output(['slack-history-export','--token',args.token,'--channel','papers']).decode('utf-8'))
-    subject = 'Occasional papers list'
+    subject = 'Occasional papers list: '+send_papers_from_this_date.strftime('%Y-%b-%d')+' until '+today.strftime('%Y-%b-%d')
     content_list = []
     for message in papers:
+        ### uncomment below if you want it per week or per day
+        # per week:
+        # send_papers_from_this_data = datetime_now - datetime.timedelta(days=7)
+        # per day:
+        # send_papers_from_this_data = datetime_now.isoformat() < message['isoDate']:
+        if not send_papers_from_this_date.isoformat() < message['isoDate']:
+            continue
+                
         if 'attachments' in message:
-            ### uncomment below if you want it per week or per day
-            # per week:
-            # send_papers_from_this_data = datetime_now - datetime.timedelta(days=7)
-            # per day:
-            # send_papers_from_this_data = datetime_now.isoformat() < message['isoDate']:
-            if send_papers_from_this_date.isoformat() < message['isoDate']:
+            
                 attachments = message['attachments']
                 for attachment in attachments:
-                    #print(attachment['title'], attachment['title_link'])
-                    if args.receiver_emails:
-                        content_list.append([attachment['title'],attachment['title_link']])
-
+                    content_list.append([attachment['title'],attachment['title_link']])
+        elif 'http' in message['text']:
+            title = message['text'].split('<')[0].strip()
+            link = message['text'].split('<')[1].split('>')[0]
+            content_list.append([title,link])
+            
     if args.receiver_emails and content_list:
-        html_msg = html_table(content_list)
+        html_msg = html_table(content_list, send_papers_from_this_date.strftime('%Y-%b-%d'), today.strftime('%Y-%b-%d'))
         if not args.testrun:
-            #send_email(args.sender_user, args.sender_password,args.receiver_emails.split(','), subject, html_msg)
+            send_email(args.sender_user, args.sender_password,args.receiver_emails.split(','), subject, html_msg)
             with open(logfile,'a') as out:
                 out.write('\nemail sent to: '+args.receiver_emails )
             pass
@@ -115,4 +121,4 @@ if __name__ == "__main__":
 
         print('HTML msg:\n\n')
         print(html_msg)
-
+        print('\n\nEmail sent to:', args.receiver_emails)
