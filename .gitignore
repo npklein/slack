@@ -1,3 +1,6 @@
 slack-history-export.log
 token.txt
 testRun.sh
+*sh
+*log
+*txt
