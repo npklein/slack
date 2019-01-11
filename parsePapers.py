@@ -68,22 +68,16 @@ if __name__ == "__main__":
     else:
         with open(logfile) as prev_logfile:
             logdata = prev_logfile.read()
+            date_sent = logdata.split('Last sent at: ')[1].split('\n')[0]
             if 'email sent to' in logdata:
-                date_sent = logdata.split('Trying to send at: ')[1].split('\n')[0]
                 print('Last time email was sent was at',date_sent,', sending all papers since that time')
+                print(date_sent)
                 send_papers_from_this_date = datetime.datetime.strptime(date_sent.split('.')[0], '%Y-%m-%d %H:%M:%S')
             else:
                 print('Last time it was run the e-mail did not get sent. Trying to send all papers of previous week (since',send_papers_from_this_date,')')
-                send_papers_from_this_date = today - datetime.timedelta(days=7)
-    
+                send_papers_from_this_date = datetime.datetime.strptime(date_sent.split('.')[0], '%Y-%m-%d %H:%M:%S')
+
     print('Sending papers from',send_papers_from_this_date, 'until', today)
-    
-    if args.testrun:
-        print('TESTRUN, not writing to logfile so that last sent date does not get overwritten')
-    else:
-        print('write to '+logfile)
-        with open(logfile,'w') as out:
-            out.write('Trying to send at: '+str(datetime.datetime.now()))
 
     papers = json.loads(subprocess.check_output(['slack-history-export','--token',args.token,'--channel','papers']).decode('utf-8'))
     subject = 'Occasional papers list: '+send_papers_from_this_date.strftime('%Y-%b-%d')+' until '+today.strftime('%Y-%b-%d')
@@ -96,24 +90,21 @@ if __name__ == "__main__":
         # send_papers_from_this_data = datetime_now.isoformat() < message['isoDate']:
         if not send_papers_from_this_date.isoformat() < message['isoDate']:
             continue
-                
         if 'attachments' in message:
-            
-                attachments = message['attachments']
-                for attachment in attachments:
-                    content_list.append([attachment['title'],attachment['title_link']])
+            attachments = message['attachments']
+            for attachment in attachments:
+                if 'title' not in attachment:
+                    continue
+                content_list.append([attachment['title'],attachment['title_link']])
         elif 'http' in message['text']:
             title = message['text'].split('<')[0].strip()
             link = message['text'].split('<')[1].split('>')[0]
             content_list.append([title,link])
-            
+
     if args.receiver_emails and content_list:
         html_msg = html_table(content_list, send_papers_from_this_date.strftime('%Y-%b-%d'), today.strftime('%Y-%b-%d'))
         if not args.testrun:
             send_email(args.sender_user, args.sender_password,args.receiver_emails.split(','), subject, html_msg)
-            with open(logfile,'a') as out:
-                out.write('\nemail sent to: '+args.receiver_emails )
-            pass
         else:
             print('TESTRUN, NOT SENDING EMAIL')
             print('emails to send to:',args.receiver_emails)
@@ -121,4 +112,13 @@ if __name__ == "__main__":
 
         print('HTML msg:\n\n')
         print(html_msg)
-        print('\n\nEmail sent to:', args.receiver_emails)
+        if not args.testrun:
+            print('\n\nEmail sent to:', args.receiver_emails)
+
+    if args.testrun:
+        print('TESTRUN, not writing to logfile so that last sent date does not get overwritten')
+    else:
+        print('write to '+logfile)
+        with open(logfile,'w') as out:
+            out.write('Last sent at: '+str(datetime.datetime.now()))
+            out.write('\nemail sent to: '+args.receiver_emails )
