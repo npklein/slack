@@ -1,0 +1,13 @@
+downloadHistory.py downloads all history that is available to you
+
+Uses slack-history-export, install with:
+
+    npm install slack-history-export
+
+Get your slack token at:
+
+    https://api.slack.com/custom-integrations/legacy-tokens
+
+
+Run with
+    python downloadHistory.py <slack token>
