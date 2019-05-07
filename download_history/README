@@ -1,1 +1,13 @@
-downloadHistory.py downloads all history that is available to you
+downloadHistory.py downloads all message history that is available to you
+
+Uses slack-history-export (https://github.com/hisabimbola/slack-history-export), install with:
+
+    npm install slack-history-export
+
+Get your slack token at:
+
+    https://api.slack.com/custom-integrations/legacy-tokens
+
+
+Run with
+    python parsePapers.py <slack token> <outdir> [--exclude_channels]
