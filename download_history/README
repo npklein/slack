@@ -10,4 +10,4 @@ Get your slack token at:
 
 
 Run with
-    python parsePapers.py <slack token> <outdir> [--exclude_channels]
+    python download_history.py <slack token> <outdir> [--exclude_channels]
