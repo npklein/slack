@@ -21,6 +21,9 @@ if args.exclude_channels:
 else:
     print('Downloading chat history of all channels')
 
+
+print('Send a message in any slack channel or direct message to start downloading....')
+
 class Downloader():
     def __init__(self, web_client):
         self.web_client = web_client
