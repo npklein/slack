@@ -6,6 +6,8 @@ Install slack-history-export (https://github.com/hisabimbola/slack-history-expor
 
     npm install slack-history-export
 
+and add the directory in which it is installed to your PATH.
+
 Get your slack token at:
 
     https://api.slack.com/custom-integrations/legacy-tokens
