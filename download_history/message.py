@@ -43,7 +43,7 @@ class Message():
             if 'title' in file_info:
                 file_name = "".join([x if x.isalnum() else "_" for x in file_info['title']])
             else:
-                file_name = message_date_str+'_noTitle'
+                file_name = self.date_str+'_noTitle'
             if 'filetype' in file_info:
                 extension = file_info['filetype']
             else:
