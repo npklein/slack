@@ -69,7 +69,7 @@ class Downloader():
                                           self.web_client.token, '--'+search_type, name]
             subprocess_output = subprocess.check_output(slack_command)
             history = json.loads(subprocess_output.decode('utf-8'))
-            prev_day = None
+            prev_out = None
             out = None
             slack_message = None
             for message_data in history:
@@ -93,16 +93,22 @@ class Downloader():
                         if os.path.exists(files_dir+'/'+file_name):
                             continue
                         open( files_dir+'/'+file_name, 'wb').write(content)
-    
+                outfile = outdir+'/'+ slack_message.date_str+'.txt'
+
                 # because we have multiple messages from different dates, check when the messages are from a different date, then write to different file
-                if slack_message.date_str != prev_day:  
+                if outfile != prev_out:
+                    # if running for first time and file already exists, skip
+                    if os.path.exists(outfile):
+                        continue
                     if out:
+                        print('written to '+prev_out)
                         out.close()
-                    out = open(outdir+'/'+ slack_message.date_str+'.txt','w')
+                    out = open(outfile,'w')
+                    
                 text = slack_message.parse_text()
                 if text:
                     out.write(text)
-        
+                prev_out = outfile
 
 # ============== Message Events ============= #
 # When a user sends a DM, the event type will be 'slack_message'.
