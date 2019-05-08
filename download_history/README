@@ -11,3 +11,5 @@ Get your slack token at:
 
 Run with
     python download_history.py <slack token> <outdir> [--exclude_channels]
+
+It will start downloading as soon as any message is sent to any slack channel, group or direct message.
