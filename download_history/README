@@ -1,13 +1,18 @@
 downloadHistory.py downloads all message history that is available to you up until 00:00 this morning.
 
-Uses slack-history-export (https://github.com/hisabimbola/slack-history-export), install with:
+To use it: Download or clone the whole repository. 
 
-    npm install slack-history-export
+Install slack-history-export (https://github.com/hisabimbola/slack-history-export):
+
+    npm install slack-history-export -g
 
 Get your slack token at:
 
     https://api.slack.com/custom-integrations/legacy-tokens
 
+Install the slack api 
+
+    pip3 install slackclient
 
 Run with
     python download_history.py <slack token> <outdir> [--exclude_channels]
