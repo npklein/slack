@@ -4,7 +4,7 @@ To use it: Download or clone the whole repository.
 
 Install slack-history-export (https://github.com/hisabimbola/slack-history-export):
 
-    npm install slack-history-export
+    npm install slack-history-export -g
 
 and add the slack-history-export/bin/ directory to your PATH.
 
