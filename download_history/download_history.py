@@ -87,7 +87,7 @@ class Downloader():
                 # download files from messages
                 if slack_message.has_file:
                     for file_name, content in slack_message.download_files():
-                        files_dir = 'slack_history/'+name+'/'+slack_message.date_str
+                        files_dir = args.outdir+'/'+name+'/'+slack_message.date_str
                         if not os.path.exists(files_dir):
                             os.makedirs(files_dir)
                         if os.path.exists(files_dir+'/'+file_name):
