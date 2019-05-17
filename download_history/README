@@ -1,4 +1,4 @@
-downloadHistory.py downloads all message history that is available to you up until 00:00 this morning.
+download_history.py downloads all message history that is available to you up until 00:00 this morning.
 
 To use it: Download or clone the whole repository. 
 
