@@ -5,7 +5,7 @@ import json
 import subprocess
 from message import Message
 import os
-
+import datetime
 import argparse
 from werkzeug.datastructures import is_immutable
 
@@ -15,6 +15,9 @@ parser.add_argument('outdir', help='Direcotry to write slack message files to')
 parser.add_argument('--exclude_channels', help='Comma separated list of channels to exclude')
 
 args = parser.parse_args()
+
+today = date.today()
+print("Today's date:", today)
 
 if args.exclude_channels:
     print('Downloading chat history of channels, excluding '+ args.exclude_channels)
@@ -27,19 +30,16 @@ print('Send a message in any slack channel or direct message to start downloadin
 class Downloader():
     def __init__(self, web_client):
         self.web_client = web_client
-        
+
     def start_downloading_messages(self, outdir):
         '''Download all channels chat history. Download up to and including yesterday. Then transfer to the cluster'''
-                
         print('start downloading history')
-        
+
         # Get all the channel IDs
         for channel in self.web_client.conversations_list(types='public_channel,private_channel,mpim')['channels']:
             # Convert channel ID to channel name
-            
 
             # exclude some channels
-            
 
             # Get the history of the channel (tried to do it using the python API but did not work, so using slack-history-export)
             if channel['is_im']:
