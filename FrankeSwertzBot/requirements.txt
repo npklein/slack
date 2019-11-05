@@ -1,0 +1,4 @@
+slackclient>=2.0.0
+certifi
+gspread
+oauth2client

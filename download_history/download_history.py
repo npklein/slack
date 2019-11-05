@@ -8,6 +8,7 @@ import os
 import datetime
 import argparse
 from werkzeug.datastructures import is_immutable
+from datetime import date
 
 parser = argparse.ArgumentParser(description='Download all available slack messages up until last midnight.')
 parser.add_argument('token', help='Slack Token. You can generate it from here https://api.slack.com/custom-integrations/legacy-tokens')
@@ -83,7 +84,6 @@ class Downloader():
                 if(slack_message.is_today()):
                     # don't download messages from today
                     continue
-                
                 # download files from messages
                 if slack_message.has_file:
                     for file_name, content in slack_message.download_files():
@@ -104,7 +104,6 @@ class Downloader():
                         print('written to '+prev_out)
                         out.close()
                     out = open(outfile,'w')
-                    
                 text = slack_message.parse_text()
                 if text:
                     out.write(text)

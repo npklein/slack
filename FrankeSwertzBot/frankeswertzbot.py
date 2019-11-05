@@ -1,0 +1,33 @@
+import slack
+from flask import Flask, request, Response
+import spreadsheet
+
+with open('bot_OAuth_token.txt') as input_file:
+    token = input_file.read().strip()
+client = slack.WebClient(token=token)
+app = Flask(__name__)
+
+with open('webtoken_secret.txt') as input_file:
+    secret = input_file.read().strip()
+
+
+
+@app.route('/slack', methods=['POST'])
+def inbound():
+    if request.form.get('token') == secret:
+        channel = request.form.get('channel_name')
+        username = request.form.get('user_name')
+        text = request.form.get('text')
+
+        frankeswertzsheet = spreadsheet.FrankeSwertzSheet()
+        text = frankeswertzsheet.get_next_meeting()
+
+        response = client.chat_postMessage(
+            channel=channel,
+            text=text)
+        assert response["ok"]
+    return Response(), 200
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

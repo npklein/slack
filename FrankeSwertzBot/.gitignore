@@ -1,0 +1,6 @@
+client_secret.json
+OAuth_token.txt
+bot_OAuth_token.txt
+webtoken_secret.txt
+__pycache__/
+.idea

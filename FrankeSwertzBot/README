@@ -1,0 +1,13 @@
+
+
+Need the webtoken files 
+    webtoken_secret.txt
+    bot_OAuth_token.txt
+
+Start ngrok in screen
+
+    ngrok http 5000
+
+Start Flask app
+
+    python python receive.py

@@ -3,4 +3,6 @@ token.txt
 testRun.sh
 *sh
 *log
-*txt
+download_history/Bot_User_OAuth_Access_Token.txt
+download_history/OAuth_Access_Token.txt
+download_history/slack_export/
