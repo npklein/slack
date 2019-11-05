@@ -14,12 +14,12 @@ with open('webtoken_secret.txt') as input_file:
 
 
 @app.route('/slack', methods=['POST'])
-def inbound():
+def schedule_request():
     # Receives post requests from / commands. Parse the commands and print something
     if request.form.get('token') == secret:
         channel = request.form.get('channel_name')
         username = request.form.get('user_name')
-        text = request.form.get('text')
+#        text = request.form.get('text')
 
         frankeswertzsheet = spreadsheet.FrankeSwertzSheet()
         text = frankeswertzsheet.get_next_meeting()
@@ -35,12 +35,41 @@ def inbound():
         assert response["ok"]
     return Response(), 200
 
+@app.route('/slap', methods=['POST'])
+def slap():
+    # Receives post requests from / commands. Parse the commands and print something
+    if request.form.get('token') == secret:
+        channel = request.form.get('channel_name')
+        username = request.form.get('user_name')
+        text = request.form.get('text')
+        if len(text.strip()) == 0:
+            message =  f'<@{username}> slaps no one around a bit with a large trout'
+
+        elif text.startswith('@'):
+            text = text.replace('@','')
+            message = f'<@{username}> slaps <@{text}> around a bit with a large trout'
+        else:
+            message = f'<@{username}> slaps '+text+' around a bit with a large trout'
+        if channel == 'directmessage':
+            response = client.chat_postMessage(
+                channel='@'+username,
+                text=message)
+        else:
+            pass
+            response = client.chat_postMessage(
+                channel=channel,
+                text=message)
+        assert response["ok"]
+    return Response(), 200
+
+
+
 def send_schedule_reminder():
     frankeswertzsheet = spreadsheet.FrankeSwertzSheet()
     text = 'Weekly reminder:\n'+frankeswertzsheet.get_next_meeting()
     text += '\nHave a great weekend!'
     response = client.chat_postMessage(
-        channel="download_history",
+        channel="frankeswertz_general",
         text=text)
     assert response["ok"]
     return Response(), 200
