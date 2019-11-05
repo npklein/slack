@@ -2,6 +2,8 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 import locale
+
+
 class FrankeSwertzSheet():
     def __init__(self):
         # use creds to create a client to interact with the Google Drive API
@@ -48,5 +50,4 @@ class FrankeSwertzSheet():
             if len(remark) > 0:
                 message.append('Remark: '+remark)
             return('\n'.join(message))
-
 
